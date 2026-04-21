@@ -77,7 +77,9 @@ function testPageRender() {
         "content" => "This is a test page.",
     ]);
 
-    return assertExpression(strpos($html, "Test title") !== false);
+    return assertExpression(
+        str_contains($html, "Test title") || strpos($html, "Test title") !== false
+    );
 }
 
 $testFramework->add("Database Connection", "testDbConnection");
@@ -90,4 +92,4 @@ $testFramework->add("Page Render", "testPageRender");
 
 $testFramework->run();
 
-echo $testFramework->getResults();
+echo $testFramework->getResult();
