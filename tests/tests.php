@@ -78,7 +78,7 @@ function testPageRender() {
     ]);
 
     return assertExpression(
-        str_contains($html, "Test title") || strpos($html, "Test title") !== false
+        strpos($html, "Test title") || strpos($html, "Test title") !== false
     );
 }
 
