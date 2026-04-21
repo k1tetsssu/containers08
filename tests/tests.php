@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/testframework.php';
 require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../modeles/database.php';
+require_once __DIR__ . '/../modules/database.php';
 require_once __DIR__ . '/../modules/page.php';
 
 $testFramework = new TestFramework();
