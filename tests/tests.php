@@ -80,6 +80,6 @@ $testFramework->add("Database Update", "testDbUpdate");
 $testFramework->add("Database Delete", "testDbDelete");
 $testFramework->add("Page Render", "testPageRender");
 
-$testFramework->runTests();
+$testFramework->run();
 
 echo $testFramework->getResults();
