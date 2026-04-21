@@ -72,13 +72,13 @@ function testPageRender() {
         return assertExpression(strpos($html, "Test title") !== false);
     }
 
-$testFramework->addTest("Database Connection", "testDbConnection");
-$testFramework->addTest("Database Count", "testDbCount");
-$testFramework->addTest("Database Create", "testDbCreate");
-$testFramework->addTest("Database Read", "testDbRead");
-$testFramework->addTest("Database Update", "testDbUpdate");
-$testFramework->addTest("Database Delete", "testDbDelete");
-$testFramework->addTest("Page Render", "testPageRender");
+$testFramework->add("Database Connection", "testDbConnection");
+$testFramework->add("Database Count", "testDbCount");
+$testFramework->add("Database Create", "testDbCreate");
+$testFramework->add("Database Read", "testDbRead");
+$testFramework->add("Database Update", "testDbUpdate");
+$testFramework->add("Database Delete", "testDbDelete");
+$testFramework->add("Page Render", "testPageRender");
 
 $testFramework->runTests();
 
