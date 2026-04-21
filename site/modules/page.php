@@ -10,7 +10,7 @@ class Page {
     public function Render($data) {
         $output = $this->template;
         foreach ($data as $key => $value) {
-            $output = str_replace("{{ $key }}", $value, $output);
+            $output = str_replace("{{$key}}", $value, $output);
         }
         return $output;
     }
