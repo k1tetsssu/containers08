@@ -13,8 +13,6 @@ pipeline {
             }
         }
 
-
-
         stage('Install Dependencies & Config') {
             steps {
                 echo 'Preparing project and config...'
@@ -25,51 +23,40 @@ pipeline {
         
                     echo "Creating test configuration..."
         
-                    cat > site/config.php <<'PHP'
+                    cat > site/config.php <<'EOF'
         <?php
         $config = [
             "db" => [
                 "path" => __DIR__ . "/../test_database.db"
             ]
         ];
-        PHP
+        EOF
+        
+                    echo "Checking PHP configuration..."
+                    php -l site/config.php
         
                     echo "Initializing database..."
         
-                    cat > init_db.php <<'PHP'
-        <?php
+                    php -r '
+                        $path = __DIR__ . "/test_database.db";
+                        $pdo = new PDO("sqlite:" . $path);
+                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        $dbPath = __DIR__ . "/test_database.db";
+                        $schema = file_get_contents("sql/schema.sql");
         
-        $pdo = new PDO("sqlite:" . $dbPath);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                        if ($schema === false) {
+                            die("Schema not found!");
+                        }
         
-        $schema = file_get_contents(__DIR__ . "/sql/schema.sql");
-        
-        if ($schema === false) {
-            die("Error: schema.sql not found!");
-        }
-        
-        $pdo->exec($schema);
-        
-        echo "Schema imported successfully!\\n";
-        PHP
-        
-                    php init_db.php
+                        $pdo->exec($schema);
+                        echo "Schema imported successfully!\\n";
+                    '
         
                     echo "Checking database..."
                     ls -lh test_database.db
-        
-                    echo "Checking configuration..."
-                    php -r '
-                        require "site/config.php";
-                        echo $config["db"]["path"] . PHP_EOL;
-                        echo file_exists($config["db"]["path"]) ? "Database exists" : "Database missing";
-                    '
                 '''
             }
         }
-
 
         
         stage('Install Dependencies') {
@@ -85,7 +72,7 @@ pipeline {
             steps {
                 echo 'Running tests from /tests directory...'
                 
-                sh 'for test_file in tests/*.php; do php "$test_file"; done'
+                sh 'php tests/tests.php'
                 
                 echo 'Tests passed successfully!'
             }
