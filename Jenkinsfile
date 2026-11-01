@@ -24,7 +24,7 @@ pipeline {
                         "path" => "test_database.db"
                     ]
                 ];
-                ' > config.php
+                ' > site/config.php
                 """
                 echo 'Mock config.php created successfully.'
             }
