@@ -16,7 +16,11 @@ pipeline {
         stage('Install Dependencies & Config') {
                 steps {
                     echo 'Preparing project and config...'
-                    // Создаем config.php
+                    
+                    // Add this line to clear the old database before starting
+                    sh 'rm -f test_database.db'
+                    
+                    // Create config.php
                     sh """
                     echo '<?php
                     \$config = [
@@ -24,12 +28,11 @@ pipeline {
                             "path" => "test_database.db"
                         ]
                     ];
-                    ' > site/config.php
+                    ' > config.php
                     """
                     echo 'Mock config.php created successfully.'
                     
                     echo 'Initializing database schema...'
-                    // Создаем и запускаем init_db.php без использования cat << EOF
                     sh """
                     echo '<?php
                     \$pdo = new PDO("sqlite:test_database.db");
@@ -38,13 +41,13 @@ pipeline {
                         \$pdo->exec(\$schema);
                         echo "Schema imported successfully.\\n";
                     } else {
-                        echo "Error: site/sql/schema.sql not found!\\n";
+                        echo "Error: sql/schema.sql not found!\\n";
                     }
                     ' > init_db.php
                     
                     php init_db.php
                     """
-               }
+            }
         }
         
         stage('Install Dependencies') {
