@@ -13,38 +13,38 @@ pipeline {
             }
         }
 
-stage('Install Dependencies & Config') {
-        steps {
-            echo 'Preparing project and config...'
-            sh """
-            echo '<?php
-            \$config = [
-                "db" => [
-                    "path" => "test_database.db"
-                ]
-            ];
-            ' > site/config.php
-            """
-            echo 'Mock config.php created successfully.'
-            
-            echo 'Initializing database schema...'
-            // Создаем и запускаем временный PHP-скрипт для применения SQL-схемы
-            sh '''
-            cat << 'EOF' > init_db.php
-            <?php
-            $pdo = new PDO("sqlite:test_database.db");
-            $schema = file_get_contents("site/sql/schema.sql");
-            if ($schema) {
-                $pdo->exec($schema);
-                echo "Schema imported successfully.\\n";
-            } else {
-                echo "Error: site/sql/schema.sql not found!\\n";
+        stage('Install Dependencies & Config') {
+                steps {
+                    echo 'Preparing project and config...'
+                    sh """
+                    echo '<?php
+                    \$config = [
+                        "db" => [
+                            "path" => "test_database.db"
+                        ]
+                    ];
+                    ' > site/config.php
+                    """
+                    echo 'Mock config.php created successfully.'
+                    
+                    echo 'Initializing database schema...'
+                    // Создаем и запускаем временный PHP-скрипт для применения SQL-схемы
+                    sh '''
+                    cat << 'EOF' > init_db.php
+                    <?php
+                    $pdo = new PDO("sqlite:test_database.db");
+                    $schema = file_get_contents("site/sql/schema.sql");
+                    if ($schema) {
+                        $pdo->exec($schema);
+                        echo "Schema imported successfully.\\n";
+                    } else {
+                        echo "Error: site/sql/schema.sql not found!\\n";
+                    }
+                    EOF
+                    php init_db.php
+                    '''
+                }
             }
-            EOF
-            php init_db.php
-            '''
-        }
-    }
         
         stage('Install Dependencies') {
             steps {
