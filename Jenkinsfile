@@ -13,42 +13,48 @@ pipeline {
             }
         }
 
+
         stage('Install Dependencies & Config') {
-                steps {
-                    echo 'Preparing project and config...'
-                    
-                    // Add this line to clear the old database before starting
-                    sh 'rm -f test_database.db'
-                    
-                    // Create config.php
-                    sh """
-                    echo '<?php
-                    \$config = [
-                        "db" => [
-                            "path" => "test_database.db"
-                        ]
-                    ];
-                    ' > config.php
-                    """
-                    echo 'Mock config.php created successfully.'
-                    
-                    echo 'Initializing database schema...'
-                    sh """
-                    echo '<?php
-                    \$pdo = new PDO("sqlite:test_database.db");
-                    \$schema = file_get_contents("sql/schema.sql");
-                    if (\$schema !== false) {
-                        \$pdo->exec(\$schema);
-                        echo "Schema imported successfully.\\n";
-                    } else {
-                        echo "Error: sql/schema.sql not found!\\n";
-                    }
-                    ' > init_db.php
-                    
+            steps {
+                echo 'Preparing project and config...'
+        
+                sh '''
+                    rm -f test_database.db
+        
+                    cat > config.php <<'PHP'
+        <?php
+        $config = [
+            "db" => [
+                "path" => __DIR__ . "/test_database.db"
+            ]
+        ];
+        PHP
+        
+                    cat > init_db.php <<'PHP'
+        <?php
+        
+        $pdo = new PDO("sqlite:" . __DIR__ . "/test_database.db");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        $schema = file_get_contents(__DIR__ . "/sql/schema.sql");
+        
+        if ($schema === false) {
+            die("Error: sql/schema.sql not found!");
+        }
+        
+        $pdo->exec($schema);
+        
+        echo "Schema imported successfully.\\n";
+        PHP
+        
                     php init_db.php
-                    """
+        
+                    echo "Database created:"
+                    ls -l test_database.db
+                '''
             }
         }
+
         
         stage('Install Dependencies') {
             steps {
