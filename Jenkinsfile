@@ -33,7 +33,7 @@ pipeline {
                     sh """
                     echo '<?php
                     \$pdo = new PDO("sqlite:test_database.db");
-                    \$schema = file_get_contents("site/sql/schema.sql");
+                    \$schema = file_get_contents("sql/schema.sql");
                     if (\$schema !== false) {
                         \$pdo->exec(\$schema);
                         echo "Schema imported successfully.\\n";
