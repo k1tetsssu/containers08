@@ -16,6 +16,7 @@ pipeline {
         stage('Install Dependencies & Config') {
                 steps {
                     echo 'Preparing project and config...'
+                    // Создаем config.php
                     sh """
                     echo '<?php
                     \$config = [
@@ -28,23 +29,23 @@ pipeline {
                     echo 'Mock config.php created successfully.'
                     
                     echo 'Initializing database schema...'
-                    // Создаем и запускаем временный PHP-скрипт для применения SQL-схемы
-                    sh '''
-                    cat << 'EOF' > init_db.php
-                    <?php
-                    $pdo = new PDO("sqlite:test_database.db");
-                    $schema = file_get_contents("site/sql/schema.sql");
-                    if ($schema) {
-                        $pdo->exec($schema);
+                    // Создаем и запускаем init_db.php без использования cat << EOF
+                    sh """
+                    echo '<?php
+                    \$pdo = new PDO("sqlite:test_database.db");
+                    \$schema = file_get_contents("site/sql/schema.sql");
+                    if (\$schema !== false) {
+                        \$pdo->exec(\$schema);
                         echo "Schema imported successfully.\\n";
                     } else {
                         echo "Error: site/sql/schema.sql not found!\\n";
                     }
-                    EOF
+                    ' > init_db.php
+                    
                     php init_db.php
-                    '''
-                }
-            }
+                    """
+               }
+        }
         
         stage('Install Dependencies') {
             steps {
