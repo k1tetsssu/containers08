@@ -12,6 +12,23 @@ pipeline {
                 sh 'php -v'
             }
         }
+
+        stage('Install Dependencies & Config') {
+            steps {
+                echo 'Preparing project and config...'
+                
+                sh """
+                echo '<?php
+                \$config = [
+                    "db" => [
+                        "path" => "test_database.db"
+                    ]
+                ];
+                ' > config.php
+                """
+                echo 'Mock config.php created successfully.'
+            }
+        }
         
         stage('Install Dependencies') {
             steps {
